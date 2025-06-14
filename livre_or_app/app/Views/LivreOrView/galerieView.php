@@ -175,11 +175,6 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<!-- <script>
-  window.onload = function() {
-      window.location.href = "<?= base_url('livre-dor/card/' . $card['livre_or_id']) ?>?download=1";
-  };
-</script> -->
 
 <script>
 function capitalizeWords(str) {
@@ -211,14 +206,14 @@ textarea.addEventListener('input', function() {
       const params = new URLSearchParams(window.location.search);
       if(params.has('download_card')) {
           const cardId = params.get('download_card');
-          // Crée un lien invisible pour forcer le téléchargement
+          // Create a link to download the card
           const link = document.createElement('a');
           link.href = "<?= base_url('livre-dor/card/') ?>" + cardId + "?download=1";
           link.download = "carte_" + cardId + ".png";
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
-          // Nettoie l'URL pour éviter de retélécharger au refresh
+          // Try to remove the download_card parameter from the URL
           window.history.replaceState({}, document.title, window.location.pathname);
       }
   });

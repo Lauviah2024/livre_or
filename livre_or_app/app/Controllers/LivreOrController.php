@@ -121,31 +121,6 @@ class LivreOrController extends ResourceController
         return strlen($text) > $maxLength ? substr($text, 0, $maxLength - 3) . '...' : $text;
     }
 
-    // Cut the message on the cadr length
-    // private function wrapTextByWidth($fontSize, $angle, $fontFile, $text, $maxWidth)
-    // {
-    //     $words = explode(' ', $text);
-    //     $lines = [];
-    //     $currentLine = '';
-
-    //     foreach ($words as $word) {
-    //         $testLine = $currentLine ? $currentLine . ' ' . $word : $word;
-    //         $bbox = imagettfbbox($fontSize, $angle, $fontFile, $testLine);
-    //         $lineWidth = $bbox[2] - $bbox[0];
-    //         if ($lineWidth > $maxWidth && $currentLine) {
-    //             $lines[] = $currentLine;
-    //             $currentLine = $word;
-    //         } else {
-    //             $currentLine = $testLine;
-    //         }
-    //     }
-    //     if ($currentLine) {
-    //         $lines[] = $currentLine;
-    //     }
-    //     return $lines;
-    // }
-
-
     // Generate card
     public function generateCard($id)
     {
@@ -235,10 +210,6 @@ class LivreOrController extends ResourceController
                 imagecopy($image, $resizedImage, 70, 130, 0, 0, $targetWidth, $targetHeight);
                 imagedestroy($userImage);
                 imagedestroy($resizedImage);
-
-                // $userImage = imagescale($userImage, 130, 270);
-                // imagecopy($image, $userImage, 45, 130, 0, 0, 120, 120);
-                // imagedestroy($userImage);
             }
         }
 
