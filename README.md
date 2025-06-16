@@ -1,15 +1,15 @@
 # The Livre_or
 This app allows people to write testimonies, messages, comments on customed cards of the rotary Club members.
-You just need to submit your name, your club name, your city, your message. And then, the app will generate the card template with your informations in the gallery and download it.
+You just need to submit your name, your club name, your city, your message. And then, the app will generate the card template with your informations in the gallery and download it. With the php graphic draw library, the users informations are drawn on the template in the two case : the case where the user uploaded an image and the case where the user didn't uploaded anything.
 
 ## Fonctionnalities
 Here are the fonctionnalities :
 - Generate the testimonies cards in the galery
 - Download your generated card on your device
 
-## Technology
-- PHP Codeigniter 4 for the backend,
-- HTML, CSS, Javascript for the frontend
+## Technologies
+- PHP Codeigniter 4 with PHP Graphic Draw library for the backend,
+- HTML, CSS, Javascript, bootstrap for the frontend
 
 ## How to set up the project ?
 
