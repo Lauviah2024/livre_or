@@ -69,6 +69,36 @@
         height: 250px;
       }
     }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .pagination a, .pagination strong {
+        display: inline-block;
+        padding: 8px 14px;
+        text-decoration: none;
+        color: #3498db;
+        border-radius: 4px;
+        transition: all 0.3s ease-in-out;
+        background-color: #f2f2f2;
+        border: 1px solid #ddd;
+    }
+
+    .pagination a:hover {
+        background-color: #e1ecf4;
+        color: #2980b9;
+    }
+
+    .pagination strong {
+        background-color: #3498db;
+        color: white;
+        font-weight: bold;
+        border-color: #3498db;
+    }
   </style>
 </head>
 <body>
@@ -110,7 +140,7 @@
       <div class="col-md-6">
         <div class="carte-postale">
           <div class="slider-container">
-            <!-- Affiche la carte personnalisée générée dynamiquement -->
+            <!-- Display cards dynamically -->
             <img src="<?= base_url('livre-dor/card/' . $card['livre_or_id']) ?>"
                  alt="Carte personnalisée"
                  class="img-fluid w-100"
@@ -119,10 +149,13 @@
         </div>
       </div>
     <?php endforeach; ?>
+    <div class="pagination" style="text-align: center;">
+      <?= $pager->links() ?>
+    </div>
   </div>
 </div>
 
-<!-- Modal Formulaire -->
+<!-- Modal Form -->
 <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -156,7 +189,7 @@
 
           </div>
           <div class="mb-3">
-            <label class="form-label">Téléchargez votre carte</label>
+            <label class="form-label">Insérez votre image. Elle doit être sous format 500 x 500.</label>
             <div class="row">
               <div class="col-6">
                 <input type="file" name="livre_or_image" class="form-control">
@@ -177,31 +210,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
-function capitalizeWords(str) {
-    return str.replace(/\w\S*/g, function(txt){
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
-}
+  function capitalizeWords(str) {
+      return str.replace(/\w\S*/g, function(txt){
+          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      });
+  }
 
-['livre_or_name', 'livre_or_club_name', 'livre_or_city'].forEach(function(field) {
-    const input = document.querySelector('input[name="'+field+'"]');
-    if (input) {
-        input.addEventListener('blur', function() {
-            input.value = capitalizeWords(input.value);
-        });
-    }
-});
-</script>
+  ['livre_or_name', 'livre_or_club_name', 'livre_or_city'].forEach(function(field) {
+      const input = document.querySelector('input[name="'+field+'"]');
+      if (input) {
+          input.addEventListener('blur', function() {
+              input.value = capitalizeWords(input.value);
+          });
+      }
+  });
 
-<script>
-const textarea = document.getElementById('livre_or_message');
-const charCount = document.getElementById('charCount');
-textarea.addEventListener('input', function() {
-    charCount.textContent = textarea.value.length + ' / 500';
-});
-</script>
+  const textarea = document.getElementById('livre_or_message');
+  const charCount = document.getElementById('charCount');
+  textarea.addEventListener('input', function() {
+      charCount.textContent = textarea.value.length + ' / 500';
+  });
 
-<script>
   window.addEventListener('DOMContentLoaded', function() {
       const params = new URLSearchParams(window.location.search);
       if(params.has('download_card')) {

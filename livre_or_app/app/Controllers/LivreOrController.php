@@ -14,8 +14,16 @@ class LivreOrController extends ResourceController
 
     public function index()
     {
-        $livre_or_cards = $this->model->findAll();
-        return view('LivreOrView/galerieView', ['cards' => $livre_or_cards]);
+        // $livre_or_cards = $this->model->findAll();
+        // return view('LivreOrView/galerieView', ['cards' => $livre_or_cards]);
+
+        $livre_or_cards = $this->model->paginate(2); // 4 cartes par page
+        $pager = $this->model->pager;
+
+        return view('LivreOrView/galerieView', [
+            'cards' => $livre_or_cards,
+            'pager' => $pager
+        ]);
     }
 
     // Create a new entry in the Livre d'Or
@@ -88,7 +96,6 @@ class LivreOrController extends ResourceController
             $data['livre_or_image'] = null; // No image uploaded
             $livre_or_id = $this->model->insert($data);
             $data['livre_or_id'] = $livre_or_id;
-            // return redirect()->to('/')->with('message', 'New testimony created successfully !');
         } else {
             $module = 'livre_or_images';
             $extension = $file->getExtension();
@@ -153,6 +160,9 @@ class LivreOrController extends ResourceController
         $image = imagecreatefrompng($templatePath);
         $black = imagecolorallocate($image, 0, 0, 0);
 
+        //Blue color four the city
+        $city_colour = imagecolorallocate($image, 40, 74, 143);
+
         // Get the datas
         $name = $this->truncateText($testimony['livre_or_name'], 30);
         $clubName = $this->truncateText($testimony['livre_or_club_name'], 45);
@@ -179,7 +189,7 @@ class LivreOrController extends ResourceController
         // Write the text on the image
         imagettftext($image, $nameSize, 0, $nameX, $nameY, $black, $arialPath, $name);
         imagettftext($image, $clubSize, 0, $clubX, $clubY, $black, $arialPath, $clubName);
-        imagettftext($image, $citySize, 8, $cityX, $cityY, $black, $passionatePath, $city);
+        imagettftext($image, $citySize, 8, $cityX, $cityY, $city_colour, $passionatePath, $city);
 
         // Message with many lines
         if ($hasImage){
@@ -187,7 +197,7 @@ class LivreOrController extends ResourceController
         }else{
             $wrapped = wordwrap($message, 65, "\n", true);
         }
-        
+
         $lines = explode("\n", $wrapped);
         $y = $msgY;
         foreach ($lines as $line) {
