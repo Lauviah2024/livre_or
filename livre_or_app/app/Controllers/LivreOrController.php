@@ -17,7 +17,7 @@ class LivreOrController extends ResourceController
         // $livre_or_cards = $this->model->findAll();
         // return view('LivreOrView/galerieView', ['cards' => $livre_or_cards]);
 
-        $livre_or_cards = $this->model->paginate(2); // 4 cartes par page
+        $livre_or_cards = $this->model->paginate(2);
         $pager = $this->model->pager;
 
         return view('LivreOrView/galerieView', [
@@ -142,7 +142,7 @@ class LivreOrController extends ResourceController
             mkdir($customCardsDir, 0777, true);
         }
 
-        $filename = 'card_' . $id . '.png';
+        $filename = 'card_' . $testimony['livre_or_id'] . '.png';
         $cardPath = $customCardsDir . $filename;
 
         // If the card already exists, serve it directly
@@ -213,29 +213,75 @@ class LivreOrController extends ResourceController
                 $origWidth = imagesx($userImage);
                 $origHeight = imagesy($userImage);
 
-                $targetHeight = 290;
-                $targetWidth = intval(($targetHeight / $origHeight) * $origWidth); // conserve le ratio
+               // $targetHeight = 290;
+               // $targetWidth = intval(($targetHeight / $origHeight) * $origWidth); // conserve le ratio
+
+                // Dimensions du PNG cible
+                $pngWidth = imagesx($image);
+                $pngHeight = imagesy($image);
+                
+                // Dimensions originales de l'image utilisateur
+                $origWidth = imagesx($userImage);
+                $origHeight = imagesy($userImage);
+                
+                // Taille maximale autorisée dans le PNG (par exemple un cadre de 200x290)
+                $maxWidth = 200;
+                $maxHeight = 290;
+                
+                // Calcul du ratio
+                $ratio = $origWidth / $origHeight;
+                
+                // Calcul de la taille redimensionnée
+                if ($maxWidth / $maxHeight > $ratio) {
+                    $targetHeight = $maxHeight;
+                    $targetWidth = intval($maxHeight * $ratio);
+                } else {
+                    $targetWidth = $maxWidth;
+                    $targetHeight = intval($maxWidth / $ratio);
+                }
+
+                // $resizedImage = imagescale($userImage, $targetWidth, $targetHeight);
+
+                // // Position pour centrer l’image sur le PNG
+                // $dstX = intval(($targetWidth - $targetWidth) / 2);
+                // $dstY = intval(($targetHeight - $targetHeight) / 2);
+                // imagecopy($image, $resizedImage, $dstX, $dstY, 70, 130, $targetWidth, $targetHeight);
 
                 $resizedImage = imagescale($userImage, $targetWidth, $targetHeight);
-                imagecopy($image, $resizedImage, 70, 130, 0, 0, $targetWidth, $targetHeight);
+ 
+                // Position pour centrer l’image sur le PNG
+                // $dstX = intval(($pngWidth - $targetWidth) / 2);
+                // $dstY = intval(($pngHeight - $targetHeight) / 2);
+
+                // Fusion des images
+                imagecopy($image, $resizedImage, 70,130, 0, 0, $targetWidth, $targetHeight);
+
+                // imagecopy($image, $resizedImage, 70, 130, 0, 0, $targetWidth, $targetHeight);
                 imagedestroy($userImage);
                 imagedestroy($resizedImage);
             }
         }
 
-        // Save the generated card
-        imagepng($image, $cardPath);
-
         // Download the card generated
         $isDownload = $this->request->getGet('download');
         if ($isDownload) {
-            header('Content-Disposition: attachment; filename="carte_'.$id.'.png"');
+            header('Content-Disposition: attachment; filename="carte_'.$testimony['livre_or_name'].'.png"');
         }
 
         // Display the generated card
         header('Content-Type: image/png');
-        imagepng($image);
+        imagepng($image, $cardPath);
         imagedestroy($image);
-        exit;
+        if ($this->request->getGet('download')) {
+            return $this->response
+                ->setHeader('Content-Type', 'image/png')
+                ->setHeader('Content-Disposition', 'attachment; filename="carte_'.$testimony['livre_or_name'].'.png"')
+                ->setBody(file_get_contents($cardPath));
+        }
+
+        // Sinon, affichage direct dans <img>
+            return $this->response
+                ->setHeader('Content-Type', 'image/png')
+                ->setBody(file_get_contents($cardPath));
     }
 }

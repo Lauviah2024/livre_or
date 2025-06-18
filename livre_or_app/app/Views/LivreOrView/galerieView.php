@@ -8,7 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body {
-      background-color: #f4f7fa;
+      /* background-color: #f4f7fa; */
       font-family: 'Segoe UI', sans-serif;
     }
     .section-title {
@@ -105,9 +105,10 @@
 
 <div class="container py-5">
   <div class="text-center mb-5">
-    <h3 class="section-title">Bienvenue sur le Livre d'Or du District</h3>
-    <p class="mb-3">Partagez vos plus beaux souvenirs et messages avec la communauté.</p>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#formModal">
+    <!-- <h3 class="section-title">Bienvenue sur le Livre d'Or du District</h3> -->
+     <h3 class="section-title">Partagez vos plus beaux souvenirs et messages avec la communauté.</h3>
+    <!-- <p class="mb-3">Partagez vos plus beaux souvenirs et messages avec la communauté.</p> -->
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#formModal"  style="background-color: #003399;">
       <i class="bi bi-pencil-square"></i> Laisser un message
     </button>
   </div>
@@ -115,36 +116,33 @@
   <h3 class="section-title text-center">Ils ont apprécié !</h3>
   <p class="text-center">Découvrez les messages et cartes postales partagés par nos membres.</p>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<?php
+// Déduplication des cartes par nom, club et message
+$uniqueCards = [];
+$seen = [];
+foreach ($cards as $card) {
+    $key = strtolower(trim($card['livre_or_name'])) . '|' . strtolower(trim($card['livre_or_club_name'])) . '|' . strtolower(trim($card['livre_or_message']));
+    if (!isset($seen[$key])) {
+        $uniqueCards[] = $card;
+        $seen[$key] = true;
+    }
+}
+?>
 
 <div class="container py-5">
   <div class="row g-4 mt-2">
-    <?php foreach($cards as $card): ?>
+    <?php foreach($uniqueCards as $card): ?>
       <div class="col-md-6">
         <div class="carte-postale">
-          <div class="slider-container">
-            <!-- Display cards dynamically -->
+          <div class="slider-container position-relative">
+            <div class="loading" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:block;z-index:2;background:rgba(255,255,255,0.8);padding:1rem 2rem;border-radius:10px;">
+              <span class="spinner-border spinner-border-sm text-primary me-2"></span> Génération de la carte en cours...
+            </div>
             <img src="<?= base_url('livre-dor/card/' . $card['livre_or_id']) ?>"
                  alt="Carte personnalisée"
-                 class="img-fluid w-100"
-                 style="max-width:100%;height:auto;">
+                 class="img-fluid w-100 card-image"
+                 style="max-width:100%;height:auto;z-index:1;"
+                 onload="this.previousElementSibling.style.display='none'">
           </div>
         </div>
       </div>
@@ -169,15 +167,15 @@
         <?php endif; ?>
         <form method="post" action="<?= base_url() ?>livre-dor/submit" enctype="multipart/form-data">
           <div class="row">
-            <div class="mb-3 col-4">
+            <div class="mb-3 col-md-4 col-sm-6 col-12">
               <label class="form-label">Nom et Prénoms</label>
               <input type="text" name="livre_or_name" class="form-control" required placeholder="Entrer votre nom et prénoms">
             </div>
-            <div class="mb-3 col-4">
+            <div class="mb-3 col-md-4 col-sm-6 col-12">
               <label class="form-label">Nom du Club</label>
               <input type="text" name="livre_or_club_name" class="form-control" required placeholder="Entrer le nom de votre club">
             </div>
-            <div class="mb-3 col-4">
+            <div class="mb-3 col-md-4 col-sm-6 col-12">
               <label class="form-label">Nom de la ville</label>
               <input type="text" name="livre_or_city" class="form-control" required placeholder="Entrer le nom de votre ville">
             </div>
@@ -235,14 +233,20 @@
       const params = new URLSearchParams(window.location.search);
       if(params.has('download_card')) {
           const cardId = params.get('download_card');
-          // Create a link to download the card
-          const link = document.createElement('a');
-          link.href = "<?= base_url('livre-dor/card/') ?>" + cardId + "?download=1";
-          link.download = "carte_" + cardId + ".png";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          // Try to remove the download_card parameter from the URL
+          // Vérifie si la carte a déjà été téléchargée
+          let downloaded = localStorage.getItem('downloaded_card_' + cardId);
+          if (!downloaded) {
+              // Crée un lien pour télécharger la carte
+              const link = document.createElement('a');
+              link.href = "<?= base_url('livre-dor/card/') ?>" + cardId + "?download=1";
+              link.download = "carte_" + cardId + ".png";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              // Marque la carte comme téléchargée
+              localStorage.setItem('downloaded_card_' + cardId, '1');
+          }
+          // Retire le paramètre download_card de l'URL
           window.history.replaceState({}, document.title, window.location.pathname);
       }
   });
